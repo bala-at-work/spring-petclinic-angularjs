@@ -1,0 +1,18 @@
+{
+  "repo_notes": [
+    {
+      "content": "This repo is being modernized with devin-modernization-kit. Prioritize facts a modernization assessment needs: exact framework/library versions with file paths, how frontend assets are built and packaged into the Java build, REST endpoints, UI screens/routes, database schema source, and test coverage. Call out deprecated or end-of-life technologies explicitly.",
+      "author": "modernization-kit"
+    }
+  ],
+  "pages": [
+    { "title": "Architecture Overview", "purpose": "Modules, runtime topology, request flow from browser to database, packaging (jar/war/ear) and app server", "parent": null },
+    { "title": "Build and Toolchain", "purpose": "Build tool, wrapper, plugins, Java level, frontend build chain, CI, with exact versions and file paths", "parent": "Architecture Overview" },
+    { "title": "Backend", "purpose": "Framework and version, configuration style (XML vs Java/auto-config), layers, notable libraries", "parent": null },
+    { "title": "REST API and Controllers", "purpose": "Every endpoint or controller route with method, path, request/response shape", "parent": "Backend" },
+    { "title": "Data Model and Persistence", "purpose": "Entities, schema and seed data sources, DB vendors/profiles, persistence technology, migrations tooling", "parent": "Backend" },
+    { "title": "Frontend", "purpose": "Framework and version, screens/routes, services calling the backend, asset build and packaging", "parent": null },
+    { "title": "Testing", "purpose": "Test types, frameworks and versions, what is and is not covered, how to run", "parent": null },
+    { "title": "Dependencies and Risks", "purpose": "Dependency inventory with versions, end-of-life components, known security-sensitive libraries", "parent": null }
+  ]
+}
