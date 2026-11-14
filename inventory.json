@@ -101,26 +101,26 @@
       "issue_url": "https://github.com/bala-at-work/spring-petclinic-angularjs/issues/6"
     },
     {
-      "id": "T7",
-      "type": "spring-boot-upgrade",
-      "title": "Spring Boot 3.5 -> 4.1.x",
-      "depends_on": [
-        "T6"
-      ],
-      "effort": "M",
-      "skill": "spring-boot-upgrade 4.1",
-      "issue_url": "https://github.com/bala-at-work/spring-petclinic-angularjs/issues/7"
-    },
-    {
       "id": "T8",
       "type": "java-upgrade",
-      "title": "Java 17 -> 21",
+      "title": "Java 17 -> 21 (on Spring Boot 3.5, before the Boot 4.1 hop)",
       "depends_on": [
         "T6"
       ],
       "effort": "S",
       "skill": "java-upgrade 21",
       "issue_url": "https://github.com/bala-at-work/spring-petclinic-angularjs/issues/8"
+    },
+    {
+      "id": "T7",
+      "type": "spring-boot-upgrade",
+      "title": "Spring Boot 3.5 -> 4.1.x",
+      "depends_on": [
+        "T8"
+      ],
+      "effort": "M",
+      "skill": "spring-boot-upgrade 4.1",
+      "issue_url": "https://github.com/bala-at-work/spring-petclinic-angularjs/issues/7"
     },
     {
       "id": "T9",
@@ -224,7 +224,7 @@
     {
       "id": "T18",
       "type": "angularjs-to-angular",
-      "title": "Remove AngularJS, ui-router and the AngularJS bootstrap",
+      "title": "Remove AngularJS and Thymeleaf; serve Angular's own index.html",
       "depends_on": [
         "T12",
         "T13",
@@ -240,7 +240,7 @@
     {
       "id": "T19",
       "type": "db-migrations-flyway",
-      "title": "Flyway baseline migrations + Postgres profile and compose.yaml",
+      "title": "Flyway baseline migrations + Postgres profile and compose.yaml; remove MySQL",
       "depends_on": [
         "T6"
       ],
@@ -251,7 +251,7 @@
     {
       "id": "T20",
       "type": "db-migrations-flyway",
-      "title": "Testcontainers Postgres for integration tests in CI",
+      "title": "Testcontainers Postgres for tests in CI; remove HSQLDB (Postgres-only)",
       "depends_on": [
         "T19",
         "T2"
@@ -299,12 +299,12 @@
     }
   ],
   "questions_for_owner": [
-    "Spring Boot target line: 4.1.x (current GA, OSS support to 2027-07-31) or stop at 3.5.x (OSS ended 2026-06-30; commercial to 2032-06-30) and drop T7?",
-    "Java 21 (requested) or 25 (newest LTS, supported by Boot 4.1)?",
-    "After Postgres lands (T19), remove the mysql profile, db/mysql/*.sql and the MySQL driver, or keep both?",
-    "Keep in-memory HSQLDB as the zero-setup default/dev profile, or make Postgres the only database?",
-    "May T21 reduce actuator exposure from '*' to 'health,info' (visible behaviour change)?",
-    "Keep the Thymeleaf templates/index.html host page after the Angular migration, or serve Angular's own index.html and drop Thymeleaf?",
-    "Is anything deploying the Docker Hub image arey/springboot-petclinic referenced in docker-compose.yml?"
+    "Spring Boot target line: 4.1.x or stop at 3.5.x? DECISION: 4.1.x, keep T7 (3.5 OSS support ended 2026-06-30).",
+    "Java 21 or 25? DECISION: Java 21, not 25 now. T8 (Java 21) runs before T7 (Boot 4.1) so Boot 4.1 is the only variable.",
+    "Remove MySQL after Postgres lands? DECISION: yes, in T19 (mysql profile, db/mysql/*.sql, driver).",
+    "Keep HSQLDB? DECISION: remove in T20; Postgres only (Testcontainers for tests, compose for local dev); zero-setup spring-boot:run given up.",
+    "Reduce actuator exposure to health,info? DECISION: yes, in T21, in its own commit.",
+    "Angular hosting? DECISION: keep the Thymeleaf host page during migration; serve Angular's index.html and drop Thymeleaf in T18.",
+    "Is anything deploying arey/springboot-petclinic? DECISION: no; replace it in T22."
   ]
 }

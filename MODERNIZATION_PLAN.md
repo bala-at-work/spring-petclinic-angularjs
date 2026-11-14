@@ -58,7 +58,8 @@
 - **Angular coexistence:** two frameworks served from one webjar during T11–T17; routing hand-off between hash-prefixed
   ui-router URLs (`#!/owners`) and Angular routes must be decided in T11.
 - **Postgres vs. existing vendors:** schema exists twice (HSQLDB, MySQL); Flyway baseline must reproduce the HSQLDB
-  seed data exactly, and sequences must be reset after seeding. MySQL's future is an owner decision.
+  seed data exactly, and sequences must be reset after seeding. Owner decision: MySQL goes in T19, HSQLDB in T20
+  (Postgres only; zero-setup `spring-boot:run` is given up).
 - **Wire contract:** `GET /owners/*/pets/{petId}` (wildcard) and the date formats in pets/visits must survive Boot 3 path
   matching and Jackson changes — covered by T2.
 - **Unknowns:** behaviour on JDK 17+ was not tried (baseline only); coverage not measured; Docker image never built in
@@ -73,8 +74,8 @@
 | T4 | spring-boot-upgrade | Spring Boot 2.1.3 -> 2.7.x on JDK 8 | T2, T3 | M | `spring-boot-upgrade 2.7` | [#4](https://github.com/bala-at-work/spring-petclinic-angularjs/issues/4) |
 | T5 | java-upgrade | Java 8 -> 17 (on Spring Boot 2.7) | T4 | M | `java-upgrade 17` | [#5](https://github.com/bala-at-work/spring-petclinic-angularjs/issues/5) |
 | T6 | spring-boot-upgrade | Spring Boot 2.7 -> 3.5.x (javax -> jakarta, Hibernate 6) | T5 | M | `spring-boot-upgrade 3.5` | [#6](https://github.com/bala-at-work/spring-petclinic-angularjs/issues/6) |
-| T7 | spring-boot-upgrade | Spring Boot 3.5 -> 4.1.x | T6 | M | `spring-boot-upgrade 4.1` | [#7](https://github.com/bala-at-work/spring-petclinic-angularjs/issues/7) |
-| T8 | java-upgrade | Java 17 -> 21 | T6 | S | `java-upgrade 21` | [#8](https://github.com/bala-at-work/spring-petclinic-angularjs/issues/8) |
+| T8 | java-upgrade | Java 17 -> 21 (on Spring Boot 3.5, before the Boot 4.1 hop) | T6 | S | `java-upgrade 21` | [#8](https://github.com/bala-at-work/spring-petclinic-angularjs/issues/8) |
+| T7 | spring-boot-upgrade | Spring Boot 3.5 -> 4.1.x | T8 | M | `spring-boot-upgrade 4.1` | [#7](https://github.com/bala-at-work/spring-petclinic-angularjs/issues/7) |
 | T9 | frontend-build-modernize | Bower -> npm dependencies (same majors) with lockfile and current Node LTS | T3 | M | `frontend-build-modernize` | [#9](https://github.com/bala-at-work/spring-petclinic-angularjs/issues/9) |
 | T10 | frontend-build-modernize | Gulp -> Vite asset build, same webjar output | T9 | M | `frontend-build-modernize` | [#10](https://github.com/bala-at-work/spring-petclinic-angularjs/issues/10) |
 | T11 | angularjs-to-angular | Scaffold Angular 22 app alongside AngularJS (layout, routing, HTTP client, build wiring) | T10 | M | `angularjs-to-angular scaffold` | [#11](https://github.com/bala-at-work/spring-petclinic-angularjs/issues/11) |
@@ -84,31 +85,34 @@
 | T15 | angularjs-to-angular | Migrate owner-form (create/edit owner) screen to Angular | T11 | M | `angularjs-to-angular owner-form` | [#15](https://github.com/bala-at-work/spring-petclinic-angularjs/issues/15) |
 | T16 | angularjs-to-angular | Migrate pet-form (create/edit pet) screen to Angular | T11 | M | `angularjs-to-angular pet-form` | [#16](https://github.com/bala-at-work/spring-petclinic-angularjs/issues/16) |
 | T17 | angularjs-to-angular | Migrate visits screen to Angular | T11 | M | `angularjs-to-angular visits` | [#17](https://github.com/bala-at-work/spring-petclinic-angularjs/issues/17) |
-| T18 | angularjs-to-angular | Remove AngularJS, ui-router and the AngularJS bootstrap | T12, T13, T14, T15, T16, T17 | S | `angularjs-to-angular remove-angularjs` | [#18](https://github.com/bala-at-work/spring-petclinic-angularjs/issues/18) |
-| T19 | db-migrations-flyway | Flyway baseline migrations + Postgres profile and compose.yaml | T6 | M | `db-migrations-flyway` | [#19](https://github.com/bala-at-work/spring-petclinic-angularjs/issues/19) |
-| T20 | db-migrations-flyway | Testcontainers Postgres for integration tests in CI | T19, T2 | M | `db-migrations-flyway` | [#20](https://github.com/bala-at-work/spring-petclinic-angularjs/issues/20) |
+| T18 | angularjs-to-angular | Remove AngularJS and Thymeleaf; serve Angular's own index.html | T12, T13, T14, T15, T16, T17 | S | `angularjs-to-angular remove-angularjs` | [#18](https://github.com/bala-at-work/spring-petclinic-angularjs/issues/18) |
+| T19 | db-migrations-flyway | Flyway baseline migrations + Postgres profile and compose.yaml; remove MySQL | T6 | M | `db-migrations-flyway` | [#19](https://github.com/bala-at-work/spring-petclinic-angularjs/issues/19) |
+| T20 | db-migrations-flyway | Testcontainers Postgres for tests in CI; remove HSQLDB (Postgres-only) | T19, T2 | M | `db-migrations-flyway` | [#20](https://github.com/bala-at-work/spring-petclinic-angularjs/issues/20) |
 | T21 | dependency-cve-remediation | Dependency CVE scan in CI, fix remaining critical/high, add Dependabot | T7, T18 | M | `dependency-cve-remediation` | [#21](https://github.com/bala-at-work/spring-petclinic-angularjs/issues/21) |
 | T22 | containerize | Reproducible non-root image (buildpacks/Jib) and compose for app + Postgres | T8, T19 | M | `containerize` | [#22](https://github.com/bala-at-work/spring-petclinic-angularjs/issues/22) |
 | T23 | docs | Rewrite README for the modern stack | T20, T21, T22 | S | none | [#23](https://github.com/bala-at-work/spring-petclinic-angularjs/issues/23) |
 
 Ordering notes: T2 and T3 can run in parallel after T1. The frontend track (T9–T18) needs only T3 and runs
-in parallel with the backend track (T4–T8). T12–T17 are independent of each other (one screen each; T12 first
-as the reference PR). T19 needs Boot 3 (T6); T8 needs Boot 3.5 (T6) and may merge before or after T7.
+in parallel with the backend track (T4–T7). T12–T17 are independent of each other (one screen each; T12 first
+as the reference PR). T19 needs Boot 3 (T6). Owner decision: T8 (Java 21) merges before T7 (Boot 4.1), so Boot 4.1 is the only
+variable in its PR; the table lists T8 first for that reason.
 
 ## 6. Out of scope / deferred
 - Re-architecture (splitting into services, moving to an `/api` prefix, OpenAPI-first) — not requested; would break the wire contract.
 - UI redesign beyond Angular parity (Bootstrap 3 look is kept; a Bootstrap 5 / Angular Material refresh can follow T18).
 - Publishing container images / deployment pipelines — T22 builds locally only.
-- MySQL removal — waits for the owner answer below.
 - Maven Central rate-limiting seen in the assessment VM — an environment issue handled in the org blueprint, not an app task.
 
 ## 7. Questions for the owner
-1. **Spring Boot target line:** plan targets **4.1.x** (current GA 4.1.2; OSS support to 2027-07-31, commercial to 2028-07-31 per
-   api.spring.io). Alternative: stop at **3.5.x** and drop T7 — its OSS support already ended 2026-06-30, so it only makes sense
-   with a commercial (extended to 2032-06-30) subscription. Which?
-2. **Java 21 vs 25:** you asked for 21; 25 is the newest LTS (Temurin EOL 2031-09-30) and Boot 4.1 supports it. Keep 21?
-3. **MySQL:** after Postgres lands (T19), remove the `mysql` profile, `db/mysql/*.sql` and MySQL driver, or keep both?
-4. **HSQLDB:** keep in-memory HSQLDB as the zero-setup default/dev profile, or make Postgres (Testcontainers / compose) the only database?
-5. **Actuator exposure:** `management.endpoints.web.exposure.include=*` exposes every endpoint at `/manage`. May T21 reduce it to `health,info` (a visible behaviour change)?
-6. **Angular hosting:** keep the Thymeleaf `templates/index.html` host page during and after the migration, or serve Angular's own `index.html` and drop Thymeleaf after T18?
-7. **Legacy Docker Hub image** `arey/springboot-petclinic` in `docker-compose.yml`: is anything deploying it? If not, T22 replaces it with a locally built image.
+Answered by the owner on 2026-11-14; the affected issues were updated.
+1. **Spring Boot target line:** 4.1.x (current GA, OSS support to 2027-07-31) or stop at 3.5.x?
+   → **Decision: 4.1.x — keep T7.** 3.5's OSS support ended 2026-06-30.
+2. **Java 21 vs 25?** → **Decision: Java 21.** Do not go to 25 now. Owner sequencing change: **T8 (Java 21) before T7 (Boot 4.1)**,
+   so Boot 4.1 is the only variable in its PR (T7 now depends on T8).
+3. **MySQL** after Postgres lands? → **Decision: remove in T19** — the `mysql` profile, `db/mysql/*.sql` and the driver.
+4. **HSQLDB?** → **Decision: remove too (T20).** Postgres is the only database: Testcontainers for tests, compose for local dev.
+   Losing zero-setup `spring-boot:run` is accepted.
+5. **Actuator exposure `*`?** → **Decision: reduce to `health,info` in T21**, in its own commit (visible behaviour change).
+6. **Angular hosting?** → **Decision: keep the Thymeleaf host page during migration**, then serve Angular's own `index.html` and
+   drop Thymeleaf in T18.
+7. **`arey/springboot-petclinic` Docker Hub image?** → **Decision: nothing deploys it; replace it in T22.**
